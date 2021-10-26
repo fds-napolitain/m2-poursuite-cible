@@ -50,6 +50,21 @@ class Poursuite:
             else:
                 self.target_pixels.clear()
 
+    def correlation_pearson(self):
+        """
+        Doit retourner un coefficient de corrélation entre deux images
+        À appliquer sur toutes les images segmentant l'image I, de même taille que l'image cible.
+        :return:
+        """
+
+    def find_area(self):
+        """
+        Doit montrer (rectangle rouge) la zone trouvée correspondante au plus haute coefficient
+        de corrélation de Pearson.
+        :return:
+        """
+
+
 poursuite = Poursuite("SequenceSansVariation")
 while True:
     key = cv2.waitKey(40) # 25 fps
