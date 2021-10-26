@@ -1,5 +1,4 @@
 import os
-
 import cv2
 import numpy as np
 
@@ -18,7 +17,7 @@ class Poursuite:
 
     def reload(self):
         self.img = cv2.imread(os.path.join(self.folder, self.img_path[self.index]))  # img left
-        cv2.imshow(self.img_path[self.index], self.img)
+        cv2.imshow("Poursuite d'image", self.img)
         self.index = (self.index + 1) % len(self.img_path)
 
 
