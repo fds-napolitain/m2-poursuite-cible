@@ -28,7 +28,7 @@ class Poursuite:
 
     def create_target(self, event, x, y, flags, param):
         """
-        Select pixel on both images (same coordinates)
+        Create crop of image, which is target to track
         :param event: click listener
         :param x: x coordinate
         :param y: y coordinate
@@ -45,8 +45,10 @@ class Poursuite:
                         self.target_pixels[0][0]:self.target_pixels[1][0]
                     ]
                     cv2.imshow("Cible", self.target_img)
-                    self.target_pixels.clear()
-
+                    cv2.rectangle(self.img, self.target_pixels[0], self.target_pixels[1], (0, 0, 255), 2)
+                    cv2.imshow("Poursuite de cible", self.img)
+            else:
+                self.target_pixels.clear()
 
 poursuite = Poursuite("SequenceSansVariation")
 while True:
