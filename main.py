@@ -36,12 +36,13 @@ class Poursuite:
         :param param: useless
         """
         if event == cv2.EVENT_LBUTTONDOWN:
-            if len(self.target_pixels) < 2:
+            if len(self.target_pixels) < 2: # tant qu'on a pas 2 points
                 self.target_pixels.append((x, y))
-                if len(self.target_pixels) == 2:
+                if len(self.target_pixels) == 2: # 2 points: rectangle
+                    print(self.target_pixels)
                     self.target_img = self.img[
-                        self.target_pixels[0][1]:self.target_pixels[1][1]-self.target_pixels[0][1],
-                        self.target_pixels[0][0]:self.target_pixels[1][0]-self.target_pixels[0][0]
+                        self.target_pixels[0][1]:self.target_pixels[1][1],
+                        self.target_pixels[0][0]:self.target_pixels[1][0]
                     ]
                     cv2.imshow("Cible", self.target_img)
                     self.target_pixels.clear()
