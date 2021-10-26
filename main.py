@@ -1,6 +1,5 @@
 import os
 import cv2
-import numpy as np
 
 
 class Poursuite:
@@ -12,8 +11,12 @@ class Poursuite:
         self.folder = folder
         self.img_path = os.listdir(folder)  # path, window name
         self.img_path.sort()
-        self.index = 0 # index des frames
+        self.index = 0  # index des frames
         self.target_pixels = []
+        self.img = cv2.imread(os.path.join(self.folder, self.img_path[self.index]))  # img left
+        self.height, self.width, self.depth = self.img.shape
+        self.target_img = 0
+        self.target_height, target_width, target_depth = 0
         self.reload()
         cv2.setMouseCallback("Poursuite de cible", self.create_target)
 
@@ -23,6 +26,7 @@ class Poursuite:
         :return:
         """
         self.img = cv2.imread(os.path.join(self.folder, self.img_path[self.index]))  # img left
+        self.find_area()
         cv2.imshow("Poursuite de cible", self.img)
         self.index = (self.index + 1) % len(self.img_path)
 
@@ -36,26 +40,33 @@ class Poursuite:
         :param param: useless
         """
         if event == cv2.EVENT_LBUTTONDOWN:
-            if len(self.target_pixels) < 2: # tant qu'on a pas 2 points
+            if len(self.target_pixels) < 2:  # tant qu'on a pas 2 points
                 self.target_pixels.append((x, y))
-                if len(self.target_pixels) == 2: # 2 points: rectangle
+                if len(self.target_pixels) == 2:  # 2 points: rectangle
                     print(self.target_pixels)
                     self.target_img = self.img[
                         self.target_pixels[0][1]:self.target_pixels[1][1],
                         self.target_pixels[0][0]:self.target_pixels[1][0]
                     ]
+                    self.target_height, target_width, target_depth = self.target_img.shape
                     cv2.imshow("Cible", self.target_img)
                     cv2.rectangle(self.img, self.target_pixels[0], self.target_pixels[1], (0, 0, 255), 2)
                     cv2.imshow("Poursuite de cible", self.img)
             else:
                 self.target_pixels.clear()
 
-    def correlation_pearson(self):
+    def correlation_pearson(self, img2):
         """
         Doit retourner un coefficient de corrélation entre deux images
         À appliquer sur toutes les images segmentant l'image I, de même taille que l'image cible.
+        :param img2 image to compare target with
         :return:
         """
+        mean_img1 = self.target_img.mean()
+        mean_img2 = img2.mean()
+        var_img1 = self.target_img.var()
+        var_img2 = img2.var()
+        return ((self.target_img - mean_img1).sum() * (img2 - mean_img2).sum()) / (var_img1 * var_img2) ** 0.5
 
     def find_area(self):
         """
@@ -67,8 +78,8 @@ class Poursuite:
 
 poursuite = Poursuite("SequenceSansVariation")
 while True:
-    key = cv2.waitKey(40) # 25 fps
-    if key == 27: # esc
+    key = cv2.waitKey(40)  # 25 fps
+    if key == 27:  # esc
         cv2.destroyAllWindows()
-    elif key == 32: # space
+    elif key == 32:  # space
         poursuite.reload()
