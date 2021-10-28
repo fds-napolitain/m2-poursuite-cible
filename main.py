@@ -104,12 +104,12 @@ class Poursuite:
                 if x < best_x:
                     best_tmp = [[tmp[0][0], tmp[0][1]], [tmp[1][0], tmp[1][1]]]
                     best_x = x
-                tmp[0][0] += round(self.target_width / 5)
-                tmp[1][0] += round(self.target_width / 5)
+                tmp[0][0] += round(self.target_width / 10)
+                tmp[1][0] += round(self.target_width / 10)
             tmp[0][0] = 0
             tmp[1][0] = self.target_width
-            tmp[0][1] += round(self.target_height / 5)
-            tmp[1][1] += round(self.target_height / 5)
+            tmp[0][1] += round(self.target_height / 10)
+            tmp[1][1] += round(self.target_height / 10)
         cv2.rectangle(self.img, best_tmp[0], best_tmp[1], (0, 0, 255), 2)
         return best_x
 
