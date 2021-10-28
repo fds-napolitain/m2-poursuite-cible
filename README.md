@@ -2,4 +2,6 @@
 
 ### Méthode par comparaison des distances des blocs
 
-https://user-images.githubusercontent.com/18146363/139325929-9aefbc29-9400-43e4-a897-331ae40e35ec.mov
+Le suivi de cible par comparaison des distances 
+
+https://user-images.githubusercontent.com/18146363/139326436-3de9c61a-a95f-4d9f-95ea-d3422bbf7235.mov
