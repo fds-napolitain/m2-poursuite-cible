@@ -1,6 +1,12 @@
+"""
+Poursuite de cible
+- méthode par corrélation de Pearson, par bloc
+- méthode par flot optique
+"""
+
 import os
 from cv2 import cv2
-import time
+
 
 class Poursuite:
     def __init__(self, folder):
@@ -15,8 +21,8 @@ class Poursuite:
         self.target_pixels = []
         self.img = cv2.imread(os.path.join("sequences/" + self.folder, self.img_path[self.index]))
         self.height, self.width, self.depth = self.img.shape
-        self.target_img = 0
-        self.target_height, target_width, target_depth = [0, 0, 0]
+        self.target_img = None
+        self.target_height, self.target_width, self.target_depth = [0, 0, 0]
         self.reload()
         cv2.setMouseCallback(folder, self.create_target)
 
@@ -26,7 +32,8 @@ class Poursuite:
         :return:
         """
         self.img = cv2.imread(os.path.join("sequences/" + self.folder, self.img_path[self.index]))
-        #self.find_area()
+        if len(self.target_pixels) == 2:
+            self.find_area_pearson()
         cv2.imshow(self.folder, self.img)
         self.index = (self.index + 1) % len(self.img_path)
 
@@ -43,15 +50,15 @@ class Poursuite:
             if len(self.target_pixels) < 2:  # tant qu'on a pas 2 points
                 self.target_pixels.append((x, y))
                 if len(self.target_pixels) == 2:  # 2 points: rectangle
-                    print(self.target_pixels)
                     self.target_img = self.img[
-                        self.target_pixels[0][1]:self.target_pixels[1][1],
-                        self.target_pixels[0][0]:self.target_pixels[1][0]
-                    ]
-                    self.target_height, target_width, target_depth = self.target_img.shape
+                                      self.target_pixels[0][1]:self.target_pixels[1][1],
+                                      self.target_pixels[0][0]:self.target_pixels[1][0]
+                                      ]
+                    self.target_height, self.target_width, self.target_depth = self.target_img.shape
                     cv2.imshow(self.folder + ": cible", self.target_img)
                     cv2.rectangle(self.img, self.target_pixels[0], self.target_pixels[1], (0, 0, 255), 2)
                     cv2.imshow(self.folder, self.img)
+                    print("target: " + str(self.target_pixels))
             else:
                 self.target_pixels.clear()
 
@@ -60,7 +67,7 @@ class Poursuite:
         Doit retourner un coefficient de corrélation entre deux images
         À appliquer sur toutes les images segmentant l'image I, de même taille que l'image cible.
         :param img2 image to compare target with
-        :return:
+        :return: Between -1 and 1
         """
         mean_img1 = self.target_img.mean()
         mean_img2 = img2.mean()
@@ -68,17 +75,43 @@ class Poursuite:
         var_img2 = img2.var()
         return ((self.target_img - mean_img1).sum() * (img2 - mean_img2).sum()) / ((var_img1 * var_img2) ** 0.5)
 
-    def find_area(self):
+    def dist_SAD(self, img2):
+        """
+        Retourne la somme absolue des distances entre deux images
+        :return:
+        """
+        return abs(self.target_img - img2).mean()
+
+    def dist_SSD(self, img2):
+        """
+        Retourne la somme des écarts quadratiques des distances entre deux images
+        :return:
+        """
+        return pow(self.target_img - img2, 2).mean()
+
+    def find_area_pearson(self):
         """
         Doit montrer (rectangle rouge) la zone trouvée correspondante au plus haute coefficient
         de corrélation de Pearson.
         :return:
         """
-        self.target_pixels[0][0] = 0
-        self.target_pixels[0][1] = 0
-        self.target_pixels[1][0] = self.width
-        self.target_pixels[1][1] = self.height
-        #while target_pixels[1][0] < self.width and target_pixels[1][1] < self.height:
+        best_x = 100000000 # best_corr = -1
+        tmp = [[0, 0], [self.target_width, self.target_height]]
+        while tmp[1][1] < self.height:
+            while tmp[1][0] < self.width:
+                x = self.dist_SAD(self.img[tmp[0][1]:tmp[1][1],tmp[0][0]:tmp[1][0]])
+                if x < best_x:
+                    self.target_pixels = [(tmp[0][0], tmp[1][0]), (tmp[0][1], tmp[1][1])]
+                    best_x = x
+                    print("new best value: " + str(best_x))
+                tmp[0][0] += round(self.target_width / 5)
+                tmp[1][0] += round(self.target_width / 5)
+            tmp[0][0] = 0
+            tmp[1][0] = self.target_width
+            tmp[0][1] += round(self.target_height / 5)
+            tmp[1][1] += round(self.target_height / 5)
+        cv2.rectangle(self.img, self.target_pixels[0], self.target_pixels[1], (0, 0, 255), 2)
+        return best_x
 
 
 poursuite = Poursuite("SequenceSansVariation")
