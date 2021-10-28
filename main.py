@@ -5,7 +5,7 @@ Poursuite de cible
 """
 
 import os
-from cv2 import cv2
+import cv2
 
 
 class Poursuite:
