@@ -3,7 +3,7 @@ Poursuite de cible
 - méthode par corrélation de Pearson, par bloc
 - méthode par flot optique
 """
-
+import math
 import os
 from cv2 import cv2
 
@@ -95,26 +95,26 @@ class Poursuite:
         de corrélation de Pearson.
         :return:
         """
-        best_x = 100000000 # best_corr = -1
+        best_x = math.inf # best_corr = -1
         tmp = [[0, 0], [self.target_width, self.target_height]]
+        best_tmp: list
         while tmp[1][1] < self.height:
             while tmp[1][0] < self.width:
-                x = self.dist_SAD(self.img[tmp[0][1]:tmp[1][1],tmp[0][0]:tmp[1][0]])
+                x = self.dist_SSD(self.img[tmp[0][1]:tmp[1][1],tmp[0][0]:tmp[1][0]])
                 if x < best_x:
-                    self.target_pixels = [(tmp[0][0], tmp[1][0]), (tmp[0][1], tmp[1][1])]
+                    best_tmp = [[tmp[0][0], tmp[0][1]], [tmp[1][0], tmp[1][1]]]
                     best_x = x
-                    print("new best value: " + str(best_x))
                 tmp[0][0] += round(self.target_width / 5)
                 tmp[1][0] += round(self.target_width / 5)
             tmp[0][0] = 0
             tmp[1][0] = self.target_width
             tmp[0][1] += round(self.target_height / 5)
             tmp[1][1] += round(self.target_height / 5)
-        cv2.rectangle(self.img, self.target_pixels[0], self.target_pixels[1], (0, 0, 255), 2)
+        cv2.rectangle(self.img, best_tmp[0], best_tmp[1], (0, 0, 255), 2)
         return best_x
 
 
-poursuite = Poursuite("SequenceSansVariation")
+poursuite = Poursuite("Ghost3")
 while True:
     key = cv2.waitKey(40)  # 25 fps
     if key == 27:  # esc
