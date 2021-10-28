@@ -95,8 +95,8 @@ class Poursuite:
         de corrélation de Pearson.
         :return:
         """
-        best_x = math.inf # best_corr = -1
-        tmp = [[0, 0], [self.target_width, self.target_height]]
+        tmp = [[0, 0], [self.target_width, self.target_height]] # zone de recherche, a diminuer avec plusieurs itérations
+        best_x = math.inf # algorithme de recherche par distance/bloc
         best_tmp: list
         while tmp[1][1] < self.height:
             while tmp[1][0] < self.width:
