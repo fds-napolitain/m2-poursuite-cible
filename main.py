@@ -19,6 +19,7 @@ class Poursuite:
         self.img_path.sort()
         self.index = 0  # index des frames
         self.target_pixels = []
+        self.target_pixels_saved = [[0,0], [0,0]]
         self.img = cv2.imread(os.path.join("sequences/" + self.folder, self.img_path[self.index]))
         self.height, self.width, self.depth = self.img.shape
         self.target_img = None
@@ -35,7 +36,19 @@ class Poursuite:
         if len(self.target_pixels) == 2:
             self.find_area_pearson()
         cv2.imshow(self.folder, self.img)
-        self.index = (self.index + 1) % len(self.img_path)
+        self.index += 1
+        if self.index % len(self.img_path) == 0:
+            self.index %= len(self.img_path)
+            self.target_pixels = [
+                [
+                    self.target_pixels_saved[0][0],
+                    self.target_pixels_saved[0][1]
+                ],
+                [
+                    self.target_pixels_saved[1][0],
+                    self.target_pixels_saved[1][1]
+                ]
+            ]
 
     def create_target(self, event, x, y, flags, param):
         """
@@ -50,6 +63,16 @@ class Poursuite:
             if len(self.target_pixels) < 2:  # tant qu'on a pas 2 points
                 self.target_pixels.append((x, y))
                 if len(self.target_pixels) == 2:  # 2 points: rectangle
+                    self.target_pixels_saved = [
+                        [
+                            self.target_pixels[0][0],
+                            self.target_pixels[0][1]
+                        ],
+                        [
+                            self.target_pixels[1][0],
+                            self.target_pixels[1][1]
+                        ]
+                    ]
                     self.target_img = self.img[
                                       self.target_pixels[0][1]:self.target_pixels[1][1],
                                       self.target_pixels[0][0]:self.target_pixels[1][0]
@@ -95,26 +118,33 @@ class Poursuite:
         de corrélation de Pearson.
         :return:
         """
-        tmp = [[0, 0], [self.target_width, self.target_height]] # zone de recherche, a diminuer avec plusieurs itérations
+        tmp = [ # zone de recherche, a diminuer avec plusieurs itérations
+            [
+                max(self.target_pixels[0][0]-int(self.width/10),0),
+                max(self.target_pixels[0][1]-int(self.height/10),0)
+            ]
+        ]
+        tmp.append([tmp[0][0]+self.target_width, tmp[0][1]+self.target_height])
         best_x = math.inf # algorithme de recherche par distance/bloc
         best_tmp: list
-        while tmp[1][1] < self.height:
-            while tmp[1][0] < self.width:
+        while tmp[1][1] < min(self.target_pixels[1][1]+int(self.height/10),self.height):
+            while tmp[1][0] < min(self.target_pixels[1][0]+int(self.width/10),self.width):
                 x = self.dist_SSD(self.img[tmp[0][1]:tmp[1][1],tmp[0][0]:tmp[1][0]])
                 if x < best_x:
                     best_tmp = [[tmp[0][0], tmp[0][1]], [tmp[1][0], tmp[1][1]]]
                     best_x = x
                 tmp[0][0] += round(self.target_width / 10)
                 tmp[1][0] += round(self.target_width / 10)
-            tmp[0][0] = 0
-            tmp[1][0] = self.target_width
+            tmp[0][0] = max(self.target_pixels[0][0]-int(self.width/10),0)
+            tmp[1][0] = tmp[0][0]+self.target_width
             tmp[0][1] += round(self.target_height / 10)
             tmp[1][1] += round(self.target_height / 10)
         cv2.rectangle(self.img, best_tmp[0], best_tmp[1], (0, 0, 255), 2)
+        self.target_pixels = [[x,y] for [x,y] in best_tmp]
         return best_x
 
 
-poursuite = Poursuite("Ghost3")
+poursuite = Poursuite("cat")
 while True:
     key = cv2.waitKey(40)  # 25 fps
     if key == 27:  # esc
