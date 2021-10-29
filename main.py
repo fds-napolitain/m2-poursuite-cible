@@ -133,18 +133,18 @@ class Poursuite:
                 if x < best_x:
                     best_tmp = [[tmp[0][0], tmp[0][1]], [tmp[1][0], tmp[1][1]]]
                     best_x = x
-                tmp[0][0] += round(self.target_width / 10)
-                tmp[1][0] += round(self.target_width / 10)
+                tmp[0][0] += round(self.target_width / 50)
+                tmp[1][0] += round(self.target_width / 50)
             tmp[0][0] = max(self.target_pixels[0][0]-int(self.width/10),0)
             tmp[1][0] = tmp[0][0]+self.target_width
-            tmp[0][1] += round(self.target_height / 10)
-            tmp[1][1] += round(self.target_height / 10)
+            tmp[0][1] += round(self.target_height / 50)
+            tmp[1][1] += round(self.target_height / 50)
         cv2.rectangle(self.img, best_tmp[0], best_tmp[1], (0, 0, 255), 2)
         self.target_pixels = [[x,y] for [x,y] in best_tmp]
         return best_x
 
 
-poursuite = Poursuite("cat")
+poursuite = Poursuite("Ghost3")
 while True:
     key = cv2.waitKey(40)  # 25 fps
     if key == 27:  # esc
