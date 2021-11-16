@@ -125,6 +125,17 @@ class Poursuite:
         self.target_pixels = [[x, y] for [x, y] in best_tmp]
         return best_x
 
+    def find_optical_flow(self):
+        # extraction imagette sous le motif
+        tmp = self.target_img[
+            self.target_pixels[0][1]:self.target_pixels[1][1],
+            self.target_pixels[0][0]:self.target_pixels[1][0]
+        ]
+        # calcul difféfrence intensité d'illuminance
+        transpose = cv2.transpose(tmp)
+        #resolution = cv2.multiply(cv2.invert(cv2.multiply(transpose, tmp))), transpose)
+
+
 
 poursuite = Poursuite("Ghost3")
 while True:
