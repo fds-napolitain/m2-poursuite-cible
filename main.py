@@ -6,9 +6,10 @@ Poursuite de cible
 import os
 from cv2 import cv2
 import algos.motifs.Pearson
-import algos.motifs.SAD
-import algos.motifs.SSD
-import algos.OpticalFlow
+from algos.motifs.SAD import *
+from algos.motifs.SSD import *
+from algos.optical.OpticalFlow import *
+from algos.Controls import *
 
 
 class Poursuite:
@@ -27,7 +28,7 @@ class Poursuite:
         self.height, self.width, self.depth = self.img.shape
         self.target_img = None
         self.target_height, self.target_width, self.target_depth = [0, 0, 0]
-        self.algorithm = algos.motifs.SSD.SSD()
+        self.algorithm = SSD()
         self.reload()
         cv2.setMouseCallback(folder, self.create_target)
 
