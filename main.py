@@ -113,7 +113,8 @@ class Poursuite:
             while tmp[1][0] < min(self.target_pixels[1][0] + int(self.width / 10), self.width):
                 x = self.algorithm.evaluate(self.target_img, self.img[tmp[0][1]:tmp[1][1], tmp[0][0]:tmp[1][0]])
                 if self.algorithm.compare_with(x, best_x):
-                    best_tmp = [[tmp[0][0], tmp[0][1]], [tmp[1][0], tmp[1][1]]] # enregistrement de la position du meilleur
+                    best_tmp = [[tmp[0][0], tmp[0][1]],
+                                [tmp[1][0], tmp[1][1]]]  # enregistrement de la position du meilleur
                     best_x = x
                 tmp[0][0] += round(self.target_width / 50)
                 tmp[1][0] += round(self.target_width / 50)
@@ -128,13 +129,12 @@ class Poursuite:
     def find_optical_flow(self):
         # extraction imagette sous le motif
         tmp = self.target_img[
-            self.target_pixels[0][1]:self.target_pixels[1][1],
-            self.target_pixels[0][0]:self.target_pixels[1][0]
-        ]
+              self.target_pixels[0][1]:self.target_pixels[1][1],
+              self.target_pixels[0][0]:self.target_pixels[1][0]
+              ]
         # calcul difféfrence intensité d'illuminance
         transpose = cv2.transpose(tmp)
-        #resolution = cv2.multiply(cv2.invert(cv2.multiply(transpose, tmp))), transpose)
-
+        # resolution = cv2.multiply(cv2.invert(cv2.multiply(transpose, tmp))), transpose)
 
 
 poursuite = Poursuite("Ghost3")
