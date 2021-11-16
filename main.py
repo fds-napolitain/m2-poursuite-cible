@@ -92,8 +92,11 @@ class Poursuite:
 
     def find_area(self):
         """
-        Doit montrer (rectangle rouge) la zone trouvée correspondante au plus haute coefficient
-        de corrélation de Pearson.
+        Doit montrer (rectangle rouge) la zone trouvée correspondante par
+        ou
+        - corrélation de pearson
+        - somme absolue des distances
+        - somme des écarts quadratiques
         :return:
         """
         tmp = [  # zone de recherche, a diminuer avec plusieurs itérations
@@ -109,7 +112,7 @@ class Poursuite:
             while tmp[1][0] < min(self.target_pixels[1][0] + int(self.width / 10), self.width):
                 x = self.algorithm.evaluate(self.target_img, self.img[tmp[0][1]:tmp[1][1], tmp[0][0]:tmp[1][0]])
                 if self.algorithm.compare_with(x, best_x):
-                    best_tmp = [[tmp[0][0], tmp[0][1]], [tmp[1][0], tmp[1][1]]]
+                    best_tmp = [[tmp[0][0], tmp[0][1]], [tmp[1][0], tmp[1][1]]] # enregistrement de la position du meilleur
                     best_x = x
                 tmp[0][0] += round(self.target_width / 50)
                 tmp[1][0] += round(self.target_width / 50)

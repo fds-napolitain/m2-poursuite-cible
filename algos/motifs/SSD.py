@@ -4,7 +4,7 @@ from algos.motifs.AbstractArea import AbstractArea
 
 class SSD(AbstractArea):
     """
-    Configuration de l'algorithme par somme des distances au carrés.
+    Configuration de l'algorithme par des écarts quadratiques.
     """
 
     def __init__(self):
